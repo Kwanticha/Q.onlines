@@ -1,21 +1,34 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Formik, Form, ErrorMessage } from "formik";
-import { TextSelect } from "../../../../components/TextSelect";
-import PrefixDoctor from "../../../../data/prefixDoctor.json";
-import { getTreatmentTypeAll } from "../../../../service/TreatmentType.Service";
+import PrefixDoctor from "../../../../../data/prefixDoctor.json";
+import { TextSelect } from "../../../../../components/TextSelect";
+import { getTreatmentTypeAll } from "../../../../../service/TreatmentType.Service";
+import { createDoctor , updateDoctor,getDetailDoctor} from "../../../../../service/Doctor.Service";
+
+
 import Schema from "./Validation";
 
 function FormDoctor() {
   const location = useLocation();
-
-  console.log(location);
-
   const [dataTreatment, setDataTreatment] = useState([]);
+  const [detail , setDetail] = useState(null)
 
   useEffect(() => {
     getTreatmentAll();
-  }, []);
+    if (location.state) {
+      getDetail(location.state)
+    }
+  }, [location.state]);
+  
+  async function getDetail(id) {
+    let res = await getDetailDoctor(id);
+    if (res) {
+      if (res.statusCode === 200 && res.taskStatus) {
+        setDetail(res.data);
+      }
+    }
+  }
 
   async function getTreatmentAll() {
     let res = await getTreatmentTypeAll();
@@ -26,6 +39,17 @@ function FormDoctor() {
     }
   }
 
+async function save(data) {
+    let res = location.state ? await updateDoctor(location.state, data) : await createDoctor(data)
+    if (res) {
+      if (res.statusCode === 200 && res.taskStatus) {
+        alert(location.state ? 'Update Success ' : 'Create Success');
+      }
+    }
+  }
+
+  // console.log('location', location);
+
   return (
     <Fragment>
       <div className="w-full">
@@ -33,7 +57,7 @@ function FormDoctor() {
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
-                <Link to="#" className="nav-breadcrumb">
+                <Link to="/admin/doctor" className="nav-breadcrumb">
                   ข้อมูลรายชื่อแพทย์
                 </Link>
               </li>
@@ -41,25 +65,30 @@ function FormDoctor() {
                 className="breadcrumb-item text-black fw-semibold"
                 aria-current="page"
               >
-                ข้อมูลรายชื่อแพทย์
+                {location.state ? "แก้ไข" : "เพิ่ม"}ข้อมูลรายชื่อแพทย์
               </li>
             </ol>
           </nav>
         </div>
         <div className="w-full mb-5">
-          <h2 className="title-content">ข้อมูลรายชื่อแพทย์</h2>
+          <h2 className="title-content">
+            {location.state ? "แก้ไข" : "เพิ่ม"}ข้อมูลรายชื่อแพทย์
+          </h2>
         </div>
-
         <Formik
           enableReinitialize={true}
           validationSchema={Schema}
           initialValues={{
-            prefixId: "",
-            name: "",
-            lastname: "",
-            treatment: "",
+            prefixId: detail ? detail.prefix_id : '',
+            name: detail ? detail.name : '',
+            lastname: detail ? detail.lastname : '',
+            treatment: detail ? detail.treatment_type_id : '',
           }}
-          onSubmit={(value) => {}}
+          onSubmit={(value) => {
+            console.log("submit :", value);
+            save(value);
+          
+          }}
         >
           {({ values, errors, touched, setFieldValue }) => (
             <Form>
@@ -88,12 +117,22 @@ function FormDoctor() {
                         name="name"
                         type="text"
                         value={values.name}
-                        className={`form-input ${touched.name ? (errors.name ? 'invalid' : 'valid') : ''}`}
+                        className={`form-input ${
+                          touched.name
+                            ? errors.name
+                              ? "invalid"
+                              : "valid"
+                            : ""
+                        }`}
                         onChange={(e) => {
                           setFieldValue("name", e.target.value);
                         }}
                       />
-                      <ErrorMessage component="div" name="name" className="text-invalid" />
+                      <ErrorMessage
+                        component="div"
+                        name="name"
+                        className="text-invalid"
+                      />
                     </div>
                     <div className="col-12 px-1 mt-2">
                       <label>นามสกุล</label>
@@ -101,12 +140,22 @@ function FormDoctor() {
                         name="lastname"
                         type="text"
                         value={values.lastname}
-                        className={`form-input ${touched.lastname ? (errors.lastname ? 'invalid' : 'valid') : ''}`}
+                        className={`form-input ${
+                          touched.lastname
+                            ? errors.lastname
+                              ? "invalid"
+                              : "valid"
+                            : ""
+                        }`}
                         onChange={(e) => {
                           setFieldValue("lastname", e.target.value);
                         }}
                       />
-                      <ErrorMessage component="div" name="lastname" className="text-invalid" />
+                      <ErrorMessage
+                        component="div"
+                        name="lastname"
+                        className="text-invalid"
+                      />
                     </div>
                     <div className="col-12 px-1 mt-2">
                       <label>ประเภทการรักษา</label>
@@ -124,18 +173,15 @@ function FormDoctor() {
                         getOptionValue={(x) => x.id}
                       />
                     </div>
-                    <div className="mt-3 d-flex justify-content-center">
-                      <button type="submit" className="btn btn-success mx-1">
-                        <i className="fa-solid fa-magnifying-glass mx-1"></i>
-                        บันทึก
-                      </button>
-                      <button type="reset" className="btn btn-secondary mx-1">
-                        <i className="fa-solid fa-rotate-left mx-1"></i>
-                        ล้างค่า
-                      </button>
-                    </div>
                   </div>
-                  <div className="w-full mt-5">{/* <ShowData /> */}</div>
+                  <div className="d-flex justify-content-center mt-3">
+                    <button type="submit" className="btn btn-success mx-1">
+                      บันทึก
+                    </button>
+                    <button type="reset" className="btn btn-secondary mx-1">
+                      ล้างค่า
+                    </button>
+                  </div>
                 </div>
               </div>
             </Form>
