@@ -8,3 +8,21 @@ export async function getBookAppointment(pageSize, currentPage, userId, search, 
     console.log('error', error);
   }
 }
+export async function createBookAppointment(data) {
+  try {
+    const response = await InstanceFormBody.post(`bookAppointment/createBookAppointment`, data);
+    return await response.data;
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
+// อัพเดทสถานะข้อมูล
+export async function updateStatusBook(id, data) {
+  try {
+    const response = await InstanceFormBody.put(`bookAppointment/updateStatusBook/${id}`, data);
+    return await response.data;
+  } catch (error) {
+    console.log('error', error);
+  }
+}

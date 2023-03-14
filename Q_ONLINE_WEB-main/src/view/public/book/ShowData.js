@@ -1,13 +1,13 @@
-import React, { Fragment } from 'react';
-import Profile from '../../../assets/image/Profile.png';
-import Image from '../../../assets/image/Image.png';
-import Pagination from 'react-js-pagination';
-import { baseURL } from '../../../helper/Axios';
-import DateTh from '../../../components/DateTh';
-import { TextSelect } from '../../../components/TextSelect';
-import PageSize from '../../../data/pageSize.json';
-
-function ShowData({ data, pagin, changePage, changePageSize }) {
+import React, { Fragment } from "react";
+import Profile from "../../../assets/image/Profile.png";
+import Image from "../../../assets/image/Image.png";
+import Pagination from "react-js-pagination";
+import { baseURL } from "../../../helper/Axios";
+import DateTh from "../../../components/DateTh";
+import { TextSelect } from "../../../components/TextSelect";
+import PageSize from "../../../data/pageSize.json";
+import Swal from "sweetalert2";
+function ShowData({ data, pagin, setDataBook, changePage, changePageSize }) {
   return (
     <div className="w-full">
       <div className="row d-flex justify-content-center">
@@ -42,7 +42,11 @@ function ShowData({ data, pagin, changePage, changePageSize }) {
                           <div className="d-flex justify-content-center justify-content-md-start">
                             <img
                               id={item.id}
-                              src={item.path_image ? `${baseURL}${item.path_image}` : Profile}
+                              src={
+                                item.path_image
+                                  ? `${baseURL}${item.path_image}`
+                                  : Profile
+                              }
                               className="mx-auto"
                               height={150}
                               width={150}
@@ -68,14 +72,33 @@ function ShowData({ data, pagin, changePage, changePageSize }) {
                           </div>
                           <div>{item.fullname}</div>
                           <div>
-                            <i className="fa-regular fa-clock me-1"></i>8:00 - 15:00
+                            <i className="fa-regular fa-clock me-1"></i>8:00 -
+                            15:00
                           </div>
                           <div className="d-flex justify-content-between mt-3">
                             <div className="fs-6 pt-2">
-                              จำนวน <span className="fw-semibold">{`${item.book_amount}/${item.amount}`}</span>
+                              จำนวน{" "}
+                              <span className="fw-semibold">{`${item.book_amount}/${item.amount}`}</span>
                             </div>
                             <div>
-                              <button type="button" className="btn btn-success">
+                              <button
+                                type="button"
+                                className="btn btn-success"
+                                onClick={() => {
+                                  if (localStorage.getItem("id")) {
+                                    setDataBook(item);
+                                  } else {
+                                    Swal.fire({
+                                      icon: "warning",
+                                      title: "ไม่สามารถจองคิวได้",
+                                      text: "กรุณาลงทะเบียน หรือทำการเข้าสู่ระบบก่อน",
+                                      confirmButtonText: "ตกลง",
+                                      showConfirmButton: true,
+                                      timer: false,
+                                    });
+                                  }
+                                }}
+                              >
                                 จองคิว
                               </button>
                             </div>

@@ -9,6 +9,15 @@ export async function getUsers(pageSize, currentPage, search, status) {
     console.log('error', error);
   }
 }
+// ดึงข้อมูลแบบแบ่งหน้า
+export async function getUserAll() {
+  try {
+    const response = await InstanceFormBody.get('user/getUserAll');
+    return await response.data;
+  } catch (error) {
+    console.log('error', error);
+  }
+}
 
 // ดึงข้อมูลตาม id
 export async function getDetailUser(id) {

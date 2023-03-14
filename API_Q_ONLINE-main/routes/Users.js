@@ -125,6 +125,30 @@ router.post('/createUser', async (req, res) => {
     console.log(error);
   }
 });
+router.get('/getUserAll', async function (req, res) {
+  try {
+
+    await mssql.sql.query(`SELECT * FROM [user] WHERE role = 0 AND is_used = 1`, function (err, response) {
+      if (response) {
+        if (response.recordset) {
+          var query = response.recordset;
+
+          res.status(200).send(respon.multi(query));
+        } else {
+          res.status(500).send(respon.error());
+        }
+      } else {
+        if (err) {
+          res.status(500).send(respon.error(err.originalError.info.number, err.originalError.info.message));
+        } else {
+          res.status(500).send(respon.error());
+        }
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 // router.get('/login', async (req, res) => {
 //   try {

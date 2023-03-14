@@ -17,8 +17,8 @@ function MainHistory() {
   });
 
   useEffect(() => {
-    // fetchData(10, 1, localStorage.getItem('id'), '', '', '', '', '', '', '');
-    fetchData(10, 1, '', '', '', '', '', '', '', '');
+    fetchData(10, 1, localStorage.getItem('id'), '', '', '', '', '', '', '');
+   // fetchData(10, 1, '', '', '', '', '', '', '', '');
     getTreatmentAll();
   }, []);
 
