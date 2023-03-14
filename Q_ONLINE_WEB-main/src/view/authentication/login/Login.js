@@ -120,6 +120,3 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
-
-
-/* redux เอามาช่วยให้ข้อมูลสามารถอัพเดต */

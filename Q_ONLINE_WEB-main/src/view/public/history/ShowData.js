@@ -2,11 +2,9 @@ import React from 'react';
 import { TextSelect } from '../../../components/TextSelect';
 import PageSize from '../../../data/pageSize.json';
 import Pagination from 'react-js-pagination';
-import { useNavigate } from 'react-router-dom';
+import DateTh from '../../../components/DateTh';
 
-function ShowData({ data, pagin, updateStatus, deleteData, changePage, changePageSize }) {
-  const navigate = useNavigate();
-
+function ShowData({ data, pagin, changePage, changePageSize }) {
   return (
     <div className="w-full">
       <div className="d-flex justify-content-between mb-2">
@@ -23,18 +21,6 @@ function ShowData({ data, pagin, updateStatus, deleteData, changePage, changePag
             getOptionValue={(x) => x.id}
           />
         </div>
-        <div>
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={() => {
-              navigate('/admin/doctor/form');
-            }}
-          >
-            <i className="fa-solid fa-plus mx-1"></i>
-            เพิ่ม
-          </button>
-        </div>
       </div>
       <div className="overflow-auto">
         <table className="table">
@@ -43,26 +29,36 @@ function ShowData({ data, pagin, updateStatus, deleteData, changePage, changePag
               <th scope="col" style={{ width: '5%' }}>
                 ลำดับ
               </th>
-              <th scope="col" style={{ width: '20%' }}>
+              <th scope="col" style={{ width: '10%' }}>
+                รหัสคิว
+              </th>
+              <th scope="col" style={{ width: '25%' }}>
                 ชื่อแพทย์
               </th>
-              <th scope="col" style={{ width: '20%' }}>
+              <th scope="col" style={{ width: '10%' }}>
                 ประเภทการรักษา
               </th>
-              <th scope="col" style={{ width: '20%' }}>
-              วันที่จองคิว
+              <th scope="col" style={{ width: '10%' }}>
+                วันที่จองคิว
               </th>
-              <th scope="col" style={{ width: '15%' }}>
-           คิวที่
+              <th scope="col" style={{ width: '10%' }}>
+                วันที่เข้ารับการรักษา
               </th>
-              <th scope="col" style={{ width: '20%' }}>
-                สถานะ              </th>
+              <th scope="col" style={{ width: '5%' }}>
+                คิวที่
+              </th>
+              <th scope="col" style={{ width: '10%' }}>
+                สถานะ
+              </th>
+              <th scope="col" style={{ width: '5%' }}>
+                จัดการ
+              </th>
             </tr>
           </thead>
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={9}>
                   <div className="text-center text-danger">-- ไม่พบข้อมูล --</div>
                 </td>
               </tr>
@@ -70,41 +66,18 @@ function ShowData({ data, pagin, updateStatus, deleteData, changePage, changePag
               data.map((item, index) => (
                 <tr key={item.id}>
                   <td>{(pagin.currentPage - 1) * pagin.pageSize + (index + 1)}</td>
-                  <td>{item.fullname}</td>
+                  <td>{item.code}</td>
+                  <td>{item.fullname_doctor}</td>
                   <td>{item.treatment_type_name}</td>
-                  <td>{item.is_used === 1 ? 'ใช้งาน' : 'ไม่ใช้งาน'}</td>
                   <td>
-                    {/* ปุ่มแก้ไข */}
-                    <button
-                      type="button"
-                      className="btn btn-warning text-white mx-1 mt-1"
-                      onClick={() => {
-                        navigate('/admin/doctor/form', { state: item.id });
-                      }}
-                    >
-                      <i className="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    {/* ปุ่มอัพเดทสถานะการใช้งาน */}
-                    <button
-                      type="button"
-                      className={`btn text-white mx-1 mt-1 ${item.is_used === 1 ? 'btn-danger' : 'btn-success'}`}
-                      onClick={() => {
-                        updateStatus(item.id, { status: item.is_used === 1 ? '0' : '1' });
-                      }}
-                    >
-                      {item.is_used === 1 ? <i className="fa-solid fa-lock"></i> : <i className="fa-solid fa-lock-open"></i>}
-                    </button>
-                    {/* ปุ่มลบข้อมูล */}
-                    <button
-                      type="button"
-                      className="btn btn-danger text-white mx-1 mt-1"
-                      onClick={() => {
-                        deleteData(item.id);
-                      }}
-                    >
-                      <i className="fa-solid fa-trash-can"></i>
-                    </button>
+                    <DateTh date={item.created_date} />
                   </td>
+                  <td>
+                    <DateTh date={item.open_date} />
+                  </td>
+                  <td>{item.number}</td>
+                  <td>{item.status}</td>
+                  <td></td>
                 </tr>
               ))
             )}

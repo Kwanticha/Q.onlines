@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var multer = require('multer'); //ช่วยในการอัปโหลดรูป
+var multer = require('multer');
 var mssql = require('../helper/Connect');
 var respon = require('../helper/Respon');
 

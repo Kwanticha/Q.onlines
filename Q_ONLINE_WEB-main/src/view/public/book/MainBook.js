@@ -1,57 +1,65 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { Formik,Form } from "formik";
+import { Formik, Form } from 'formik';
 import { TextSelect } from '../../../components/TextSelect';
 import { getTreatmentTypeAll } from '../../../service/TreatmentType.Service';
-import {getOpenSchedulePublic}from '../../../service/OpenSchedule.Service';
+import ModalBook from './ModalBook';
+import { getOpenSchedulePublic } from '../../../service/OpenSchedule.Service';
 import ShowData from './ShowData';
-
+import '../../../style/list.css'
 
 function MainBook() {
-    const [dataTreatment, setDataTreatment] = useState([]);
-    const [data, setData] = useState([]);
-    const [pagin, setPagin] = useState({
-        totalRow: 1,
-        pageSize: 10,
-        currentPage: 1,
-        totalPage: 1,
-      });
-    
-    useEffect(() => {
-        fetchData(10, 1, '', '', '', '');
-        getTreatmentAll();
-      }, []);
-    
-      // ฟังก์ชันดึงข้อมูลประเภทการรักษาทั้งหมด
-      async function getTreatmentAll() {
-        let res = await getTreatmentTypeAll();
-        if (res) {
-          if (res.statusCode === 200 && res.taskStatus) {
-            res.data.unshift({ id: '', name: 'ทั้งหมด' });
-            setDataTreatment(res.data);
-          }
-        }
+  const [show, setShow] = useState(false);
+  const [dataBook, setDataBook] = useState(null);
+  const [dataTreatment, setDataTreatment] = useState([]);
+  const [data, setData] = useState([]);
+  const [pagin, setPagin] = useState({
+    totalRow: 1,
+    pageSize: 10,
+    currentPage: 1,
+    totalPage: 1,
+  });
+
+  const [dataSubmit, setDataSubmit] = useState({
+    search: '',
+    treatment: '',
+    startDate: '',
+    endDate: '',
+  });
+
+  useEffect(() => {
+    fetchData(10, 1, '', '', '', '');
+    getTreatmentAll();
+  }, []);
+
+  // ฟังก์ชันดึงข้อมูลประเภทการรักษาทั้งหมด
+  async function getTreatmentAll() {
+    let res = await getTreatmentTypeAll();
+    if (res) {
+      if (res.statusCode === 200 && res.taskStatus) {
+        res.data.unshift({ id: '', name: 'ทั้งหมด' });
+        setDataTreatment(res.data);
       }
-      
-      async function fetchData (pageSize, currentPage, search, treatment, startDate, endDate) {
-       
-            let res = await getOpenSchedulePublic(pageSize, currentPage, search, treatment, startDate, endDate);
-            if (res) {
-              if (res.statusCode === 200 && res.taskStatus) {
-                setData(res.data)
-               setPagin(res.pagin);
-              }
-            }
-          }
+    }
+  }
+
+  // ฟังก์ชันดึงข้อมูลแบบแบ่งหน้า
+  async function fetchData(pageSize, currentPage, search, treatment, startDate, endDate) {
+    let res = await getOpenSchedulePublic(pageSize, currentPage, search, treatment, startDate, endDate);
+    if (res) {
+      if (res.statusCode === 200 && res.taskStatus) {
+        setData(res.data);
+        setPagin(res.pagin);
+      }
+    }
+  }
+
   return (
     <Fragment>
       <div className="w-full">
         <div className="d-flex justify-content-end">
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
-              <li
-                className="breadcrumb-item text-black fw-semibold"
-                aria-current="page"
-              >
+              <li className="breadcrumb-item text-black fw-semibold" aria-current="page">
                 จองคิว
               </li>
             </ol>
@@ -142,20 +150,37 @@ function MainBook() {
                 </button>
               </div>
               <div className="w-full mt-5">
-               <ShowData
-                data={data}
-                pagin={pagin}
-                changePage={(page) => {
+                <ShowData
+                  data={data}
+                  pagin={pagin}
+                  changePage={(page) => {
                     fetchData(pagin.pageSize, page, values.search, values.treatment, values.startDate, values.endDate);
                   }}
                   changePageSize={(pagesize) => {
                     fetchData(pagesize, 1, values.search, values.treatment, values.startDate, values.endDate);
-                  }}/>
+                  }}
+                />
               </div>
             </Form>
           )}
         </Formik>
       </div>
+      <ModalBook
+        show={show}
+        setShow={setShow}
+        dataBook={dataBook}
+        setDataBook={setDataBook}
+        reload={() => {
+          fetchData(
+            pagin.pageSize, 
+            pagin.currentPage, 
+            dataSubmit.search, 
+            dataSubmit.treatment, 
+            dataSubmit.startDate, 
+            dataSubmit.endDate
+            );
+        }}
+      />
     </Fragment>
   );
 }
